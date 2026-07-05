@@ -1,6 +1,6 @@
 # Agent Control Plane Patterns
 
-$(System.Collections.Hashtable.Name) is a public seed repository for agent control-plane architecture.
+Agent Control Plane Patterns is a public seed repository for agent control-plane architecture.
 
 ## Purpose
 
