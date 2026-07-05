@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "agent-control-plane-patterns/v0.1",
+  "packetStatus": "candidate",
+  "controlPlaneManifest": {
+    "id": "acpp:fixture:valid:agent-runtime",
+    "title": "Valid Fixture Agent Runtime Control Plane",
+    "version": "0.1.0",
+    "scope": "Reconciles desired agent run configurations against observed agent runtime state."
+  },
+  "authority": {
+    "posture": "non-canon",
+    "provenance": "https://github.com/hummbl-dev/agent-control-plane-patterns fixtures/valid/control-plane-packet-v0.1.valid.json",
+    "reviewState": "none"
+  },
+  "controlPlaneContract": {
+    "controllerSpec": {
+      "controllerId": "acpp:fixture:valid:agent-runtime-controller",
+      "reconciles": "agent run configurations",
+      "leaderElection": true
+    },
+    "reconciliationPolicy": {
+      "trigger": "on-change",
+      "idempotent": true,
+      "resyncIntervalSeconds": 30
+    },
+    "desiredStateSchema": {
+      "type": "object",
+      "properties": {
+        "agentImage": { "type": "string" },
+        "replicas": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["agentImage", "replicas"]
+    },
+    "observedStateSchema": {
+      "type": "object",
+      "properties": {
+        "readyReplicas": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["readyReplicas"]
+    },
+    "driftDetection": {
+      "method": "diff",
+      "onDrift": "reconcile"
+    }
+  },
+  "receiptRequirements": {
+    "receiptRequired": true,
+    "receiptPath": "receipts/agent-control-plane-patterns-v0.1-packet-receipt.md",
+    "provenanceRequired": true
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "agent-control-plane-patterns/v0.1",
+  "packetStatus": "candidate",
+  "controlPlaneManifest": {
+    "id": "acpp:example:agent-runtime",
+    "title": "Example Agent Runtime Control Plane",
+    "version": "0.1.0",
+    "scope": "Reconciles desired agent run configurations against observed agent runtime state."
+  },
+  "authority": {
+    "posture": "non-canon",
+    "provenance": "https://github.com/hummbl-dev/agent-control-plane-patterns examples/control-plane-packet-v0.1.example.json",
+    "reviewState": "none"
+  },
+  "controlPlaneContract": {
+    "controllerSpec": {
+      "controllerId": "acpp:example:agent-runtime-controller",
+      "reconciles": "agent run configurations",
+      "leaderElection": true
+    },
+    "reconciliationPolicy": {
+      "trigger": "on-change-and-periodic",
+      "idempotent": true,
+      "resyncIntervalSeconds": 60
+    },
+    "desiredStateSchema": {
+      "type": "object",
+      "properties": {
+        "agentImage": { "type": "string" },
+        "replicas": { "type": "integer", "minimum": 0 },
+        "tools": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["agentImage", "replicas"]
+    },
+    "observedStateSchema": {
+      "type": "object",
+      "properties": {
+        "readyReplicas": { "type": "integer", "minimum": 0 },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "status": { "type": "string", "enum": ["True", "False", "Unknown"] }
+            }
+          }
+        }
+      },
+      "required": ["readyReplicas"]
+    },
+    "driftDetection": {
+      "method": "diff",
+      "onDrift": "reconcile"
+    }
+  },
+  "receiptRequirements": {
+    "receiptRequired": true,
+    "receiptPath": "receipts/agent-control-plane-patterns-v0.1-packet-receipt.md",
+    "provenanceRequired": true
+  }
+}
