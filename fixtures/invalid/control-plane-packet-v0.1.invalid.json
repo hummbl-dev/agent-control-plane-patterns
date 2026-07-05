@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "agent-control-plane-patterns/v0.1",
+  "packetStatus": "candidate",
+  "controlPlaneManifest": {
+    "id": "acpp:fixture:invalid:agent-runtime",
+    "title": "Invalid Fixture Agent Runtime Control Plane",
+    "scope": "Reconciles desired agent run configurations against observed agent runtime state."
+  },
+  "authority": {
+    "posture": "non-canon",
+    "provenance": "https://github.com/hummbl-dev/agent-control-plane-patterns fixtures/invalid/control-plane-packet-v0.1.invalid.json"
+  },
+  "controlPlaneContract": {
+    "controllerSpec": {
+      "controllerId": "acpp:fixture:invalid:agent-runtime-controller",
+      "reconciles": "agent run configurations"
+    },
+    "reconciliationPolicy": {
+      "trigger": "on-change",
+      "idempotent": true
+    },
+    "desiredStateSchema": {
+      "type": "object"
+    },
+    "observedStateSchema": {
+      "type": "object"
+    },
+    "driftDetection": {
+      "method": "diff"
+    }
+  },
+  "receiptRequirements": {
+    "receiptRequired": true,
+    "receiptPath": "receipts/agent-control-plane-patterns-v0.1-packet-receipt.md"
+  }
+}

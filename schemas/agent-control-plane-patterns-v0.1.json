@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hummbl.dev/agent-control-plane-patterns/schemas/agent-control-plane-patterns-v0.1.json",
+  "title": "Agent Control Plane Patterns Packet v0.1",
+  "description": "Candidate (non-canon) schema for a v0.1 agent control-plane packet. See docs/v0.1-boundary.md for scope and posture.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packetStatus",
+    "controlPlaneManifest",
+    "authority",
+    "controlPlaneContract",
+    "receiptRequirements"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "agent-control-plane-patterns/v0.1",
+      "description": "Identifies the schema this packet conforms to."
+    },
+    "packetStatus": {
+      "type": "string",
+      "enum": ["candidate", "reviewed", "adopted", "deprecated"],
+      "description": "Lifecycle status of the packet. v0.1 packets are expected to be 'candidate'."
+    },
+    "controlPlaneManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "version", "scope"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable identifier for the control plane described by this packet."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable title."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SemVer-ish version of the control plane described by this packet."
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short description of what the control plane reconciles."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["posture", "provenance"],
+      "properties": {
+        "posture": {
+          "type": "string",
+          "enum": ["non-canon", "candidate", "adopted"],
+          "description": "Authoritative posture of this packet. v0.1 packets are 'non-canon'."
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Origin/source of this packet (e.g., repository URL and commit)."
+        },
+        "reviewState": {
+          "type": "string",
+          "enum": ["none", "pending", "reviewed"],
+          "description": "Current review state. Defaults to 'none' for v0.1."
+        }
+      }
+    },
+    "controlPlaneContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controllerSpec",
+        "reconciliationPolicy",
+        "desiredStateSchema",
+        "observedStateSchema",
+        "driftDetection"
+      ],
+      "properties": {
+        "controllerSpec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["controllerId", "reconciles"],
+          "properties": {
+            "controllerId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reconciles": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The resource/capability this controller reconciles."
+            },
+            "leaderElection": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "reconciliationPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["trigger", "idempotent"],
+          "properties": {
+            "trigger": {
+              "type": "string",
+              "enum": ["on-change", "periodic", "on-change-and-periodic"]
+            },
+            "idempotent": {
+              "type": "boolean"
+            },
+            "resyncIntervalSeconds": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "desiredStateSchema": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["object"],
+              "description": "Top-level type for desired state."
+            }
+          },
+          "description": "Schema describing the desired-state input to reconciliation."
+        },
+        "observedStateSchema": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["object"],
+              "description": "Top-level type for observed state."
+            }
+          },
+          "description": "Schema describing the observed-state output reported back."
+        },
+        "driftDetection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": ["diff", "hash", "versioned", "none"]
+            },
+            "onDrift": {
+              "type": "string",
+              "enum": ["reconcile", "alert", "reconcile-and-alert"]
+            }
+          }
+        }
+      }
+    },
+    "receiptRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptRequired", "receiptPath"],
+      "properties": {
+        "receiptRequired": {
+          "type": "boolean"
+        },
+        "receiptPath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the receipt artifact for this packet."
+        },
+        "provenanceRequired": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}
